@@ -1,4 +1,4 @@
-package net.likelion.bebc25.spring;
+package net.likelion.bebc25.spring.aop.springaop;
 
 public class GasolineCar implements Car {
     @Override

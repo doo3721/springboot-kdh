@@ -1,10 +1,10 @@
-package net.likelion.bebc25.spring;
+package net.likelion.bebc25.spring.di.setter;
 
 public class Driver {
     private Car car;
 
-    // 의존성 주입 (DI, Dependency Injection)
-    Driver(Car car) {
+    // setter injection
+    public void setCar(Car car) {
         this.car = car;
     }
 

@@ -1,4 +1,4 @@
-package net.likelion.bebc25.spring;
+package net.likelion.bebc25.spring.di.setter;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
