@@ -1,17 +1,16 @@
-package net.likelion.bebc25.board.post.controller;
+package net.likelion.bebc25.board01.post.controller;
 
-import net.likelion.bebc25.board.post.dto.PostDto;
+import lombok.extern.slf4j.Slf4j;
+import net.likelion.bebc25.board01.post.dto.PostDto;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@Slf4j
 public class BoardController {
     private final List<PostDto> fakePosts;
 
@@ -39,6 +38,30 @@ public class BoardController {
     public List<PostDto> getPosts() {
         List<PostDto> result = fakePosts;
         return result;
+    }
+
+    // 게시글을 DB에 등록한다
+    public void savePost(PostDto post) {
+        post.setId(getPosts().getLast().getId() + 1);
+        post.setCreatedAt(LocalDateTime.now());
+        fakePosts.add(post);
+    }
+
+    // 기존 게시글을 수정한다
+    public void updatePost(PostDto post) {
+        PostDto targetPost = null;
+        for (PostDto temp: getPosts()) {
+            if (temp.getId() == post.getId()) {
+                targetPost = temp;
+                break;
+            }
+        }
+
+        if (targetPost != null) {
+            targetPost.setTitle(post.getTitle());
+            targetPost.setContent(post.getContent());
+            targetPost.setAuthor(post.getAuthor());
+        }
     }
 
     // index 요청을 처리하는 컨트롤러
@@ -93,8 +116,8 @@ public class BoardController {
                   <div class="container">
                     <h1>게시글 목록</h1>
                     <div class="nav">
-                      <a href="/01/board/list.html">목록으로</a>
-                      <a href="/01/board/write.html">새 글 쓰기</a>
+                      <a href="list.html">목록으로</a>
+                      <a href="write.html">새 글 쓰기</a>
                       <a href="/index">홈으로</a></p>
                     </div>
                 
@@ -116,7 +139,7 @@ public class BoardController {
                         <tr>
                           <td>%s</td>
                           <td>
-                            <a href="/01/board/detail.html">%s</a>
+                            <a href="detail.html?id=%s">%s</a>
                           </td>
                           <td>%s</td>
                           <td>%s</td>
@@ -125,6 +148,7 @@ public class BoardController {
                           </td>
                         </tr>
                         """.formatted(
+                                post.getId(),
                                 post.getId(),
                                 post.getTitle(),
                                 post.getAuthor(),
@@ -145,8 +169,8 @@ public class BoardController {
     // 게시글 상세 조회하는 컨트롤러
     @GetMapping("/01/board/detail.html")
     @ResponseBody
-    public String getDetail() {
-        PostDto post = fakePosts.getFirst();
+    public String getDetail(@RequestParam("id") int id) {
+        PostDto post = fakePosts.get(id - 1);
 
         String result = """
                 <!DOCTYPE html>
@@ -161,8 +185,8 @@ public class BoardController {
                   <div class="container">
                     <h1>게시글 상세 정보</h1>
                     <div class="nav">
-                      <a href="/01/board/list.html">목록으로</a>
-                      <a href="/01/board/write.html">새 글 쓰기</a>
+                      <a href="list.html">목록으로</a>
+                      <a href="write.html">새 글 쓰기</a>
                       <a href="/index">홈으로</a></p>
                     </div>
                 """;
@@ -199,14 +223,14 @@ public class BoardController {
         result += """
                     <div>
                       <!-- 절대경로로 /board/edit.html을 지정 -->
-                      <a href="/board/edit.html" class="btn">수정하기</a>
+                      <a href="edit.html?id=%s" class="btn">수정하기</a>
                       <!-- 상대경로로 list.html을 지정 -->
                       <a href="list.html" class="btn btn-secondary">목록으로</a>
                     </div>
                   </div>
                 </body>
                 </html>
-                """;
+                """.formatted(post.getId());
 
         return result;
     }
@@ -220,40 +244,39 @@ public class BoardController {
                 <html lang="ko">
                 <head>
                   <meta charset="UTF-8">
-                  <title>스프링 게시판 - 글 수정하기</title>
+                  <title>스프링 게시판 - 글 등록하기</title>
                   <link rel="stylesheet" href="/board/css/common.css">
                   <link rel="stylesheet" href="/board/css/write.css">
                 </head>
                 <body>
                   <div class="container">
-                    <h1>게시글 수정</h1>
+                    <h1>게시글 등록</h1>
                     <div class="nav">
-                      <a href="/01/board/list.html">목록으로</a>
-                      <a href="/01/board/write.html">새 글 쓰기</a>
+                      <a href="list.html">목록으로</a>
+                      <a href="write.html">새 글 쓰기</a>
                       <a href="/index">홈으로</a></p>
                     </div>
                 
-                    <form action="detail.html">
+                    <form action="new" method="POST">
                       <input type="hidden" id="id" value="3">
                 
                       <div class="form-group">
                         <label for="title">제목</label>
-                        <input type="text" id="title" name="title" value="세 번째 게시글 제목 샘플" required>
+                        <input type="text" id="title" name="title" required>
                       </div>
                 
                       <div class="form-group">
                         <label for="author">작성자</label>
-                        <input type="text" id="author" name="author" value="작성자3" required>
+                        <input type="text" id="author" name="author" required>
                       </div>
                 
                       <div class="form-group">
                         <label for="content">내용</label>
-                        <textarea id="content" name="content" rows="10" required>이것은 정적으로 추가된 세 번째 게시글의 상세 예시 본문입니다.
-                스프링 MVC와 아키텍처 학습을 위해 모의 데이터를 채워두었습니다.</textarea>
+                        <textarea id="content" name="content" rows="10" required></textarea>
                       </div>
                 
                       <div style="margin-top: 20px;">
-                        <button type="submit" class="btn">수정</button>
+                        <button type="submit" class="btn">등록</button>
                         <a href="list.html" class="btn btn-secondary">취소</a>
                       </div>
                     </form>
@@ -262,5 +285,99 @@ public class BoardController {
                 </html>
                 """;
         return result;
+    }
+
+    // 게시글 수정 화면 요청하는 컨트롤러
+    @GetMapping("/01/board/edit.html")
+    @ResponseBody
+    public String getEditForm(@RequestParam int id) {
+        PostDto post = fakePosts.get(id - 1);
+
+        String result = """
+                <!DOCTYPE html>
+                <html lang="ko">
+                <head>
+                  <meta charset="UTF-8">
+                  <title>스프링 게시판 - 글 수정하기</title>
+                  <link rel="stylesheet" href="/board/css/common.css">
+                  <link rel="stylesheet" href="/board/css/write.css">
+                </head>
+                <body>
+                  <div class="container">
+                    <h1>게시글 수정</h1>
+                    <div class="nav">
+                      <a href="list.html">목록으로</a>
+                      <a href="write.html">새 글 쓰기</a>
+                      <a href="/index">홈으로</a></p>
+                    </div>
+                
+                    <form action="edit" method="POST">
+                      <input type="hidden" name="id" value="%s">
+                
+                      <div class="form-group">
+                        <label for="title">제목</label>
+                        <input type="text" id="title" name="title" value="%s" required>
+                      </div>
+                
+                      <div class="form-group">
+                        <label for="author">작성자</label>
+                        <input type="text" id="author" name="author" value="%s" required>
+                      </div>
+                
+                      <div class="form-group">
+                        <label for="content">내용</label>
+                        <textarea id="content" name="content" rows="10" required>%s</textarea>
+                      </div>
+                
+                      <div style="margin-top: 20px;">
+                        <button type="submit" class="btn">수정</button>
+                        <a href="detail.html" class="btn btn-secondary">취소</a>
+                      </div>
+                    </form>
+                  </div>
+                </body>
+                </html>
+                
+                """.formatted(
+                        post.getId(),
+                        post.getTitle(),
+                        post.getAuthor(),
+                        post.getContent()
+        );
+        return result;
+    }
+
+    // 게시글 등록 요청을 처리하는 컨트롤러
+    @PostMapping("/01/board/new")
+    public String writePost(
+            @RequestParam("title") String title,
+            @RequestParam("content") String content,
+            @RequestParam("author") String author
+    ) {
+        PostDto post = new PostDto(title, content, author);
+        log.debug(post.toString());
+
+        savePost(post);
+
+        // 브라우저에게 list.html로 재요청
+        return "redirect:list.html";
+    }
+
+
+
+    // 게시글 수정 요청을 처리하는 컨트롤러
+    @PostMapping("/01/board/edit")
+    public  String editPost(@ModelAttribute PostDto post) {
+        log.debug(post.toString());
+        updatePost(post);
+        return "redirect:detail.html?id=%s".formatted(post.getId());
+    }
+
+    // 게시글 삭제 요청을 처리하는 컨트롤러
+    @PostMapping("/01/board/delete")
+    public String deletePost() {
+        String result = """
+                """;
+        return "redirect:list.html";
     }
 }
