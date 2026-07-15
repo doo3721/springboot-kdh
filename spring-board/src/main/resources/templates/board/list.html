@@ -8,12 +8,14 @@
 </head>
 <body>
   <div class="container">
-    <h1>게시글 목록</h1>
-    <div class="nav">
-      <a href="list.html">목록으로</a>
-      <a href="write.html">새 글 쓰기</a>
-      <a href="/">홈으로</a>
-    </div>
+    <th:block th:replace="~{layout/common :: nav-header('게시글 목록')}">
+      <h1>타이틀</h1>
+      <div class="nav">
+        <!--      <a href="list.html">목록으로</a>-->
+        <!--      <a href="write.html">새 글 쓰기</a>-->
+        <!--      <a href="/">홈으로</a>-->
+      </div>
+    </th:block>
 
     <table>
       <thead>
@@ -29,12 +31,16 @@
         <tr th:each="post : ${posts}">
           <td th:text="${post.id}">3</td>
           <td>
-            <a th:href="@{detail.html(id=${post.id})}" th:text="${post.title}">세 번째 게시글 제목 샘플</a>
+            <a th:unless="${post.secret}" th:href="@{detail.html(id=${post.id})}" th:text="${post.title}">세 번째 게시글 제목 샘플</a>
+            <span th:if="${post.secret}">비밀글입니다.</span>
           </td>
           <td th:text="${post.author}">작성자3</td>
           <td th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2026-07-13 15:30:00</td>
           <td>
-              <a th:href="@{'delete?id=' + ${post.id}}" class="btn btn-danger">삭제</a>
+            <form th:action="@{delete(id=${post.id})}" method="post">
+<!--              <a th:href="@{'delete?id=' + ${post.id}}" class="btn btn-danger">삭제</a>-->
+              <button type="submit" class="btn btn-danger">삭제</button>
+            </form>
           </td>
         </tr>
       </tbody>
