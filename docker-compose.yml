@@ -1,0 +1,24 @@
+networks:
+  sns-net:
+    name: sns-net
+    driver: bridge
+
+volumes:
+  sns-db-data:
+    name: sns-db-data
+
+services:
+  sns-db:
+    image: mysql:9.7
+    container_name: sns-db
+    ports:
+      - "3306:3306"
+    networks:
+      - sns-net
+    environment:
+      MYSQL_DATABASE: sns_db
+      MYSQL_USER: sns_app
+      MYSQL_PASSWORD: Sns1234!
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - sns-db-data:/var/lib/mysql
