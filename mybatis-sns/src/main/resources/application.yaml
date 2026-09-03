@@ -4,11 +4,16 @@ spring:
   # 데이터베이스 접속 정보
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: 'jdbc:mysql://localhost:3306/sns_db?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true'
-    username: sns_app
-    password: Sns1234!
+    url: jdbc:mysql://localhost:3306/sns_db?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+    username: sns-app
+    password: 'Sns1234!'
 
-#MyBatis 설정
+  # 데이터베이스 초기화 설정 (애플리케이션 구동 시 schema.sql 및 data.sql 자동 실행)
+  sql:
+    init:
+      mode: always
+
+# MyBatis 설정
 mybatis:
   # 매퍼 XML 파일 경로 매핑
   mapper-locations: classpath:mapper/**/*.xml

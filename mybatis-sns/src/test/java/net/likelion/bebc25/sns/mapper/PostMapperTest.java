@@ -26,9 +26,9 @@ public class PostMapperTest {
     @Test
     @DisplayName("게시글 한 건 조회 테스트")
     void findByIdTest() {
-        PostResponseDto foundPost = postMapper.findById(1L);
+        PostResponseDto foundPost = postMapper.findById(10L);
         assertThat(foundPost).isNotNull();
-        assertThat(foundPost.id()).isEqualTo(1L);
+        assertThat(foundPost.id()).isEqualTo(10L);
 
         PostResponseDto notFoundPost = postMapper.findById(999999999L);
         assertThat(notFoundPost).isNull();

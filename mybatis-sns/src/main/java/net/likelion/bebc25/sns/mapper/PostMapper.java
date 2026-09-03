@@ -44,4 +44,10 @@ public interface PostMapper {
 
     // 11. 공통 SQL 조각 재사용 조회 (<sql>, <include>)
     PostResponseDto findByIdWithInclude(@Param("id") Long id);
+
+    // 게시글 좋아요 수 1 증가 (post 테이블)
+    void increaseLikeCount(@Param("postId") Long postId);
+
+    // 게시글 좋아요 수 1 감소 (post 테이블)
+    void decreaseLikeCount(@Param("postId") Long postId);
 }
