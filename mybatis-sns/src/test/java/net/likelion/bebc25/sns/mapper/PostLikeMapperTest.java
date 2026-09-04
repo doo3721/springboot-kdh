@@ -32,7 +32,7 @@ public class PostLikeMapperTest {
     @DisplayName("좋아요 취소 테스트")
     void deleteLikeTest() {
         Long memberId = 1L;
-        Long postId = 10L;
+        Long postId = 2L;
         postLikeMapper.insertLike(memberId, postId);
 
         int beforeCount = postLikeMapper.countLike(memberId, postId);

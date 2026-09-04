@@ -1,9 +1,9 @@
 package net.likelion.bebc25.sns.mapper;
 
-import net.likelion.bebc25.sns.dto.PostCreateDto;
-import net.likelion.bebc25.sns.dto.PostDetailResponseDto;
-import net.likelion.bebc25.sns.dto.PostResponseDto;
-import net.likelion.bebc25.sns.dto.PostSearchCondition;
+import net.likelion.bebc25.sns.dto.PostCreateRequest;
+import net.likelion.bebc25.sns.dto.PostDetailResponse;
+import net.likelion.bebc25.sns.dto.PostResponse;
+import net.likelion.bebc25.sns.dto.PostSearchRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,26 +26,26 @@ public class PostMapperTest {
     @Test
     @DisplayName("게시글 한 건 조회 테스트")
     void findByIdTest() {
-        PostResponseDto foundPost = postMapper.findById(10L);
+        PostResponse foundPost = postMapper.findById(10L);
         assertThat(foundPost).isNotNull();
         assertThat(foundPost.id()).isEqualTo(10L);
 
-        PostResponseDto notFoundPost = postMapper.findById(999999999L);
+        PostResponse notFoundPost = postMapper.findById(999999999L);
         assertThat(notFoundPost).isNull();
     }
 
     @Test
     @DisplayName("게시글 등록 테스트")
     void saveTest() {
-        PostCreateDto newPost = new PostCreateDto(1L, "신규 게시글 등록 테스트", null);
+        PostCreateRequest newPost = new PostCreateRequest(1L, "신규 게시글 등록 테스트", null);
 
         postMapper.save(newPost);
 
-        List<PostResponseDto> memberPosts = postMapper.findByMemberId(1L);
+        List<PostResponse> memberPosts = postMapper.findByMemberId(1L);
 
         assertThat(memberPosts).isNotEmpty();
 
-        PostResponseDto lastPost = memberPosts.getFirst();
+        PostResponse lastPost = memberPosts.getFirst();
         assertThat(lastPost.content()).isEqualTo(newPost.getContent());
         assertThat(lastPost.memberId()).isEqualTo(newPost.getMemberId());
     }
@@ -57,11 +57,11 @@ public class PostMapperTest {
         Long targetMemberId = 1L;
 
         // when: 해당 회원의 게시글 목록 조회
-        List<PostResponseDto> posts = postMapper.findByMemberId(targetMemberId);
+        List<PostResponse> posts = postMapper.findByMemberId(targetMemberId);
 
         // then: 조회된 모든 게시글의 memberId가 1번인지 검증
         assertThat(posts).isNotNull();
-        for (PostResponseDto post : posts) {
+        for (PostResponse post : posts) {
             assertThat(post.memberId()).isEqualTo(targetMemberId);
         }
     }
@@ -78,7 +78,7 @@ public class PostMapperTest {
         postMapper.update(targetPostId, updatedContent, updatedImageUrl);
 
         // then: 단건 조회 후 수정된 내용이 정상 반영되었는지 검증
-        PostResponseDto updatedPost = postMapper.findById(targetPostId);
+        PostResponse updatedPost = postMapper.findById(targetPostId);
         assertThat(updatedPost).isNotNull();
         assertThat(updatedPost.content()).isEqualTo(updatedContent);
         assertThat(updatedPost.imageUrl()).isEqualTo(updatedImageUrl);
@@ -88,17 +88,17 @@ public class PostMapperTest {
     @DisplayName("게시글 단건 삭제 테스트")
     void deleteByIdTest() {
         // given: 1번 회원의 신규 게시글을 먼저 등록하고 생성된 ID 확인
-        PostCreateDto post = new PostCreateDto(1L, "삭제될 임시 게시글", null);
+        PostCreateRequest post = new PostCreateRequest(1L, "삭제될 임시 게시글", null);
         postMapper.save(post);
 
-        List<PostResponseDto> posts = postMapper.findByMemberId(1L);
+        List<PostResponse> posts = postMapper.findByMemberId(1L);
         Long targetPostId = posts.getFirst().id();
 
         // when: 단건 삭제 실행
         postMapper.deleteById(targetPostId);
 
         // then: 삭제 후 단건 조회 시 null이 반환되는지 검증
-        PostResponseDto deletedPost = postMapper.findById(targetPostId);
+        PostResponse deletedPost = postMapper.findById(targetPostId);
         assertThat(deletedPost).isNull();
     }
 
@@ -109,7 +109,7 @@ public class PostMapperTest {
         Long targetPostId = 1L;
 
         // when: 3중 조인 상세 조회 실행
-        PostDetailResponseDto detail = postMapper.findPostDetailById(targetPostId);
+        PostDetailResponse detail = postMapper.findPostDetailById(targetPostId);
 
         // then: 복합 매핑 객체 정합성 검증
         if (detail != null) {
@@ -131,16 +131,16 @@ public class PostMapperTest {
     @DisplayName("동적 SQL 키워드 검색 (<where>, <if>) 테스트")
     void searchPostsWithKeywordTest() {
         // given: 테스트용 게시글 등록
-        postMapper.save(new PostCreateDto(1L, "동적 SQL 검색용 키워드 스프링부트", null));
+        postMapper.save(new PostCreateRequest(1L, "동적 SQL 검색용 키워드 스프링부트", null));
 
-        PostSearchCondition condition = new PostSearchCondition("스프링부트", null, null, null);
+        PostSearchRequest condition = new PostSearchRequest("스프링부트", null, null, null);
 
         // when: 키워드 동적 검색 실행
-        List<PostResponseDto> searchResults = postMapper.searchPosts(condition);
+        List<PostResponse> searchResults = postMapper.searchPosts(condition);
 
         // then: 검색된 모든 게시글 본문에 키워드가 포함되어 있는지 검증
         assertThat(searchResults).isNotEmpty();
-        for (PostResponseDto post : searchResults) {
+        for (PostResponse post : searchResults) {
             assertThat(post.content()).contains("스프링부트");
         }
     }
@@ -149,17 +149,17 @@ public class PostMapperTest {
     @DisplayName("동적 SQL 작성자 ID 및 다중 타겟 ID IN 절 검색 (<foreach>) 테스트")
     void searchPostsWithTargetMemberIdsTest() {
         // given: 1번 회원 게시글 등록
-        postMapper.save(new PostCreateDto(1L, "다중 ID 검색 대상 게시글", null));
+        postMapper.save(new PostCreateRequest(1L, "다중 ID 검색 대상 게시글", null));
 
         List<Long> targetIds = List.of(1L);
-        PostSearchCondition condition = new PostSearchCondition(null, null, targetIds, null);
+        PostSearchRequest condition = new PostSearchRequest(null, null, targetIds, null);
 
         // when: 다중 회원 ID 대상 IN 절 동적 검색 실행
-        List<PostResponseDto> searchResults = postMapper.searchPosts(condition);
+        List<PostResponse> searchResults = postMapper.searchPosts(condition);
 
         // then: 검색 결과의 모든 작성자가 대상 회원 목록에 포함되는지 검증
         assertThat(searchResults).isNotEmpty();
-        for (PostResponseDto post : searchResults) {
+        for (PostResponse post : searchResults) {
             assertThat(targetIds).contains(post.memberId());
         }
     }
@@ -168,10 +168,10 @@ public class PostMapperTest {
     @DisplayName("동적 SQL 정렬 분기 (<choose>, <when>, <otherwise>) 테스트")
     void findPostsWithSortTest() {
         // given: 정렬 조건 생성
-        PostSearchCondition condition = new PostSearchCondition(null, null, null, "POPULAR");
+        PostSearchRequest condition = new PostSearchRequest(null, null, null, "POPULAR");
 
         // when: 정렬 분기 쿼리 실행
-        List<PostResponseDto> posts = postMapper.findPostsWithSort(condition);
+        List<PostResponse> posts = postMapper.findPostsWithSort(condition);
 
         // then: 결과 반환 검증
         assertThat(posts).isNotNull();
@@ -193,7 +193,7 @@ public class PostMapperTest {
         postMapper.updateSelective(params);
 
         // then: 본문만 정상 변경되었는지 검증
-        PostResponseDto updatedPost = postMapper.findById(targetPostId);
+        PostResponse updatedPost = postMapper.findById(targetPostId);
         assertThat(updatedPost).isNotNull();
         assertThat(updatedPost.content()).isEqualTo(newContent);
     }
@@ -202,12 +202,12 @@ public class PostMapperTest {
     @DisplayName("동적 SQL 다중 ID 일괄 삭제 (<foreach>) 테스트")
     void deleteByIdsTest() {
         // given: 삭제할 게시글 등록 후 ID 확보
-        PostCreateDto post1 = new PostCreateDto(1L, "일괄 삭제 대상 게시글 1", null);
-        PostCreateDto post2 = new PostCreateDto(1L, "일괄 삭제 대상 게시글 2", null);
+        PostCreateRequest post1 = new PostCreateRequest(1L, "일괄 삭제 대상 게시글 1", null);
+        PostCreateRequest post2 = new PostCreateRequest(1L, "일괄 삭제 대상 게시글 2", null);
         postMapper.save(post1);
         postMapper.save(post2);
 
-        List<PostResponseDto> memberPosts = postMapper.findByMemberId(1L);
+        List<PostResponse> memberPosts = postMapper.findByMemberId(1L);
         Long id1 = memberPosts.get(0).id();
         Long id2 = memberPosts.get(1).id();
         List<Long> targetIds = List.of(id1, id2);
@@ -228,7 +228,7 @@ public class PostMapperTest {
         Long targetPostId = 1L;
 
         // when: include 태그를 활용한 단건 조회 실행
-        PostResponseDto foundPost = postMapper.findByIdWithInclude(targetPostId);
+        PostResponse foundPost = postMapper.findByIdWithInclude(targetPostId);
 
         // then: 조회 데이터 검증
         assertThat(foundPost).isNotNull();
