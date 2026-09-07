@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @Transactional(readOnly = true)
@@ -32,7 +33,7 @@ public class PostServiceImpl implements PostService {
     public PostResponse getPostById(Long id) {
         PostResponse post = postMapper.findById(id);
         if (post == null) {
-            throw new IllegalArgumentException("존재하지 않는 게시글입니다. ID: " + id);
+            throw new NoSuchElementException("존재하지 않는 게시글입니다. ID: " + id);
         }
         return post;
     }
@@ -41,7 +42,7 @@ public class PostServiceImpl implements PostService {
     public PostDetailResponse getPostDetailById(Long id) {
         PostDetailResponse detail = postMapper.findPostDetailById(id);
         if (detail == null) {
-            throw new IllegalArgumentException("존재하지 않는 게시글입니다. ID: " + id);
+            throw new NoSuchElementException("존재하지 않는 게시글입니다. ID: " + id);
         }
         return detail;
     }
@@ -56,7 +57,7 @@ public class PostServiceImpl implements PostService {
     public void updatePost(Long id, PostUpdateRequest dto) {
         // 수정 대상 게시글 존재 여부 사전 검증
         if (postMapper.findById(id) == null) {
-            throw new IllegalArgumentException("수정할 게시글이 존재하지 않습니다. ID: " + id);
+            throw new NoSuchElementException("수정할 게시글이 존재하지 않습니다. ID: " + id);
         }
         postMapper.update(id, dto.content(), dto.imageUrl());
     }
@@ -66,7 +67,7 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Long id) {
         // 삭제 대상 게시글 존재 여부 사전 검증
         if (postMapper.findById(id) == null) {
-            throw new IllegalArgumentException("삭제할 게시글이 존재하지 않습니다. ID: " + id);
+            throw new NoSuchElementException("삭제할 게시글이 존재하지 않습니다. ID: " + id);
         }
         postMapper.deleteById(id);
     }
@@ -75,7 +76,7 @@ public class PostServiceImpl implements PostService {
     @Transactional(rollbackFor = Exception.class)
     public void deletePosts(List<Long> idList) {
         if (idList == null || idList.isEmpty()) {
-            throw new IllegalArgumentException("삭제할 게시글 ID 목록이 비어있습니다.");
+            throw new NoSuchElementException("삭제할 게시글 ID 목록이 비어있습니다.");
         }
         postMapper.deleteByIds(idList);
     }

@@ -58,7 +58,7 @@ public class PostRestController {
     ) {
         PostResponse post = postService.getPostById(postId);
         if (!post.memberId().equals(memberId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new IllegalStateException("본인의 게시글만 수정이 가능합니다.");
         }
         postService.updatePost(postId, updateRequest);
         PostResponse updatedPost = postService.getPostById(postId);
@@ -72,7 +72,7 @@ public class PostRestController {
     ) {
         PostResponse post = postService.getPostById(postId);
         if (!post.memberId().equals(memberId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new IllegalStateException("본인의 게시글만 삭제가 가능합니다.");
         }
         postService.deletePost(postId);
         return ResponseEntity.noContent().build();

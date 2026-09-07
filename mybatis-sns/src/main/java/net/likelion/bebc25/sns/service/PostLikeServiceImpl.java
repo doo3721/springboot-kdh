@@ -8,6 +8,8 @@ import net.likelion.bebc25.sns.mapper.PostMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class PostLikeServiceImpl implements PostLikeService{
         // 1. 대상 게시글의 존재 여부 확인
         PostResponse post = postMapper.findById(postId);
         if (post == null) {
-            throw new IllegalArgumentException("해당 게시글이 존재하지 않습니다. id: " + postId);
+            throw new NoSuchElementException("해당 게시글이 존재하지 않습니다. id: " + postId);
         }
 
         // 2. 현재 사용자의 좋아요 등록 여부 확인
