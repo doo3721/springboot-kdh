@@ -1,5 +1,6 @@
 package net.likelion.bebc25.sns.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -12,14 +13,23 @@ import lombok.*;
 @Builder
 @ToString
 public class PostCreateRequest {
+    @Schema(hidden = true) // DB 자동 생성
     private Long id;
 
-//    @NotNull(message = "작성자 회원 번호는 필수 항목입니다.")
+    @Schema(hidden = true) // 서버 내부에서 주입
+    @NotNull(message = "작성자 회원 번호는 필수 항목입니다.")
     private Long memberId;
 
+    @Schema(
+            description = "게시글 본문 내용",
+            example = "스프링 부트 REST API 학습 중입니다.",
+            requiredMode = Schema.RequiredMode.REQUIRED
+    )
     @NotBlank(message = "본문 내용은 필수입니다.")
     @Size(max = 1000, message = "본문은 1000자 이하여야 합니다.")
     private String content;
+
+    @Schema(description = "첨부 이미지 URL", example = "https://example.com/images/post1.png", nullable = true)
     private String imageUrl;
 
     public PostCreateRequest(Long memberId, String content, String imageUrl) {
