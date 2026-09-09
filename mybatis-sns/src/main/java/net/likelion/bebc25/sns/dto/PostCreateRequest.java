@@ -17,7 +17,6 @@ public class PostCreateRequest {
     private Long id;
 
     @Schema(hidden = true) // 서버 내부에서 주입
-    @NotNull(message = "작성자 회원 번호는 필수 항목입니다.")
     private Long memberId;
 
     @Schema(

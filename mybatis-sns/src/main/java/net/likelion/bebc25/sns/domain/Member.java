@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class Member {
     private Long id;
     private String email;
+    private String nickname;
     private String password;
     private String profileImage;
     @Builder.Default

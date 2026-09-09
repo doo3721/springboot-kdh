@@ -8,15 +8,11 @@ info:
 http:
   method: POST
   url: "{{baseUrl}}/api/v1/posts"
-  headers:
-    - name: X-Member-Id
-      value: "1"
-      description: 작성자 회원 ID
   body:
     type: json
     data: |-
       {
-        "content": "스프링 부트 REST API 학습 중입니다.",
+        "content": "스프링 부트 REST API 학습 중입니다. 인증 로그인",
         "imageUrl": "https://example.com/images/post1.png"
       }
   auth: inherit

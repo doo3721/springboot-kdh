@@ -8,10 +8,6 @@ info:
 http:
   method: PUT
   url: "{{baseUrl}}/api/v1/posts/:id"
-  headers:
-    - name: X-Member-Id
-      value: "1"
-      description: 작성자 회원 ID
   params:
     - name: id
       value: "1"
@@ -21,8 +17,8 @@ http:
     type: json
     data: |-
       {
-        "content": "",
-        "imageUrl": ""
+        "content": "Hello",
+        "imageUrl": "hi"
       }
   auth: inherit
 

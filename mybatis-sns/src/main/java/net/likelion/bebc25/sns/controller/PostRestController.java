@@ -11,8 +11,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import net.likelion.bebc25.sns.dto.*;
+import net.likelion.bebc25.sns.security.principal.CustomUserDetails;
 import net.likelion.bebc25.sns.service.PostService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -63,10 +65,11 @@ public class PostRestController {
     @PostMapping
     public ResponseEntity<PostResponse> createPost(
             @Parameter(description = "작성자 회원 ID", example = "1")
-            @RequestHeader("X-Member-Id") Long memberId,
+//            @RequestHeader("X-Member-Id") Long memberId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody PostCreateRequest createRequest
     ) {
-        createRequest.setMemberId(memberId);
+        createRequest.setMemberId(userDetails.getId());
         PostResponse createdPost = postService.createPost(createRequest);
         // 좀 더 RESTful 한 개념
         URI location = URI.create("/api/v1/posts/" + createdPost.id());
@@ -119,13 +122,14 @@ public class PostRestController {
     @PutMapping("/{id}")
     public ResponseEntity<PostResponse> updatePost(
             @Parameter(description = "작성자 회원 ID", example = "1")
-            @RequestHeader("X-Member-Id") Long memberId,
+//            @RequestHeader("X-Member-Id") Long memberId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Parameter(description = "수정할 게시글 ID", example = "1")
             @PathVariable("id") Long postId,
             @Valid @RequestBody PostUpdateRequest updateRequest
     ) {
         PostResponse post = postService.getPostById(postId);
-        if (!post.memberId().equals(memberId)) {
+        if (!post.memberId().equals(userDetails.getId())) {
             throw new IllegalStateException("본인의 게시글만 수정이 가능합니다.");
         }
         postService.updatePost(postId, updateRequest);
@@ -154,12 +158,13 @@ public class PostRestController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(
             @Parameter(description = "작성자 회원 ID", example = "1")
-            @RequestHeader("X-Member-Id") Long memberId,
+//            @RequestHeader("X-Member-Id") Long memberId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Parameter(description = "삭제할 게시글 ID", example = "1")
             @PathVariable("id") Long postId
     ) {
         PostResponse post = postService.getPostById(postId);
-        if (!post.memberId().equals(memberId)) {
+        if (!post.memberId().equals(userDetails.getId())) {
             throw new IllegalStateException("본인의 게시글만 삭제가 가능합니다.");
         }
         postService.deletePost(postId);
