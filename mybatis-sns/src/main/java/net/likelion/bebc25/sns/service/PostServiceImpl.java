@@ -6,6 +6,7 @@ import net.likelion.bebc25.sns.dto.PostResponse;
 import net.likelion.bebc25.sns.dto.PostSearchRequest;
 import net.likelion.bebc25.sns.dto.PostUpdateRequest;
 import net.likelion.bebc25.sns.mapper.PostMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,21 +55,23 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasRole('ADMIN') or @postServiceImpl.isAuthor(#id, authentication.principal.id)")
     public void updatePost(Long id, PostUpdateRequest dto) {
         // 수정 대상 게시글 존재 여부 사전 검증
-        if (postMapper.findById(id) == null) {
-            throw new NoSuchElementException("수정할 게시글이 존재하지 않습니다. ID: " + id);
-        }
+//        if (postMapper.findById(id) == null) {
+//            throw new NoSuchElementException("수정할 게시글이 존재하지 않습니다. ID: " + id);
+//        }
         postMapper.update(id, dto.content(), dto.imageUrl());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @PreAuthorize("hasRole('ADMIN') or @postServiceImpl.isAuthor(#id, authentication.principal.id)")
     public void deletePost(Long id) {
         // 삭제 대상 게시글 존재 여부 사전 검증
-        if (postMapper.findById(id) == null) {
-            throw new NoSuchElementException("삭제할 게시글이 존재하지 않습니다. ID: " + id);
-        }
+//        if (postMapper.findById(id) == null) {
+//            throw new NoSuchElementException("삭제할 게시글이 존재하지 않습니다. ID: " + id);
+//        }
         postMapper.deleteById(id);
     }
 
@@ -79,5 +82,11 @@ public class PostServiceImpl implements PostService {
             throw new NoSuchElementException("삭제할 게시글 ID 목록이 비어있습니다.");
         }
         postMapper.deleteByIds(idList);
+    }
+
+    // 게시글 작성자 본인 여부를 검증하는 헬퍼 메서드
+    public boolean isAuthor(Long postId, Long memberId) {
+        PostResponse post = postMapper.findById(postId);
+        return post != null && post.memberId().equals(memberId);
     }
 }

@@ -7,10 +7,10 @@ info:
 
 http:
   method: DELETE
-  url: "{{baseUrl}}/api/v1/posts/:id"
+  url: "{{baseUrl}}/posts/:id"
   params:
     - name: id
-      value: "1"
+      value: "4"
       type: path
       description: 삭제할 게시글 ID
   auth: inherit

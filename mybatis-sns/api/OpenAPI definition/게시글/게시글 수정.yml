@@ -7,10 +7,10 @@ info:
 
 http:
   method: PUT
-  url: "{{baseUrl}}/api/v1/posts/:id"
+  url: "{{baseUrl}}/posts/:id"
   params:
     - name: id
-      value: "1"
+      value: "2"
       type: path
       description: 수정할 게시글 ID
   body:

@@ -1,0 +1,16 @@
+info:
+  name: 공지사항 등록
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{baseUrl}}/notices"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

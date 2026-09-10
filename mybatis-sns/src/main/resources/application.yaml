@@ -41,6 +41,12 @@ springdoc:
     enabled: true
     path: /v3/api-docs
 
+jwt:
+  # Base64로 인코딩된 최소 256비트(32바이트) 이상의 보안 비밀키
+  secret: aGVsbG9qYXZhd29ybGRoZWxsb2phdmF3b3JsZGhlbGxvamF2YXdvcmxkaGVsbG9qYXZhd29ybGRoZWxsb2phdmF3b3JsZA==
+  access-token-expiration: 3600000      # 1시간 (밀리초 단위)
+  refresh-token-expiration: 604800000   # 7일 (밀리초 단위)
+
 logging:
   level:
     # 스프링 시큐리티 전체 로그를 디버그 레벨로 활성화

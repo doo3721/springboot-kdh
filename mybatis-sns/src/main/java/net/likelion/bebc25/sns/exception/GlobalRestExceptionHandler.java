@@ -1,13 +1,17 @@
 package net.likelion.bebc25.sns.exception;
 
+import lombok.extern.slf4j.Slf4j;
 import net.likelion.bebc25.sns.dto.ApiErrorResponse;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.NoSuchElementException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalRestExceptionHandler {
 
@@ -23,6 +27,13 @@ public class GlobalRestExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
         ApiErrorResponse response = ApiErrorResponse.of(ErrorCode.BUSINESS_RULE_VIOLATION);
         return ResponseEntity.status(ErrorCode.BUSINESS_RULE_VIOLATION.getHttpStatus()).body(response);
+    }
+
+    // 권한이 없는 리소스 접근시 호출됨 (403 Forbidden 응답)
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAuthorizationDeniedException(AuthorizationDeniedException ex) {
+        ApiErrorResponse response = ApiErrorResponse.of(ErrorCode.FORBIDDEN_OPERATION);
+        return ResponseEntity.status(ErrorCode.FORBIDDEN_OPERATION.getHttpStatus()).body(response);
     }
 
     // 요청한 자원이 없을 때 (404 Not Found 응답)
@@ -42,6 +53,8 @@ public class GlobalRestExceptionHandler {
     // 서버 내부 오류가 발생했을 때 (500 Internal Server Error 응답)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> handleGeneralException(Exception ex) {
+        log.error(ex.getMessage());
+        ex.printStackTrace();
         ApiErrorResponse response = ApiErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR);
         return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getHttpStatus()).body(response);
     }

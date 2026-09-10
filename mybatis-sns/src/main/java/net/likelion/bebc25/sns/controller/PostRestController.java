@@ -65,7 +65,6 @@ public class PostRestController {
     @PostMapping
     public ResponseEntity<PostResponse> createPost(
             @Parameter(description = "작성자 회원 ID", example = "1")
-//            @RequestHeader("X-Member-Id") Long memberId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody PostCreateRequest createRequest
     ) {
@@ -122,16 +121,11 @@ public class PostRestController {
     @PutMapping("/{id}")
     public ResponseEntity<PostResponse> updatePost(
             @Parameter(description = "작성자 회원 ID", example = "1")
-//            @RequestHeader("X-Member-Id") Long memberId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Parameter(description = "수정할 게시글 ID", example = "1")
             @PathVariable("id") Long postId,
             @Valid @RequestBody PostUpdateRequest updateRequest
     ) {
-        PostResponse post = postService.getPostById(postId);
-        if (!post.memberId().equals(userDetails.getId())) {
-            throw new IllegalStateException("본인의 게시글만 수정이 가능합니다.");
-        }
         postService.updatePost(postId, updateRequest);
         PostResponse updatedPost = postService.getPostById(postId);
         return ResponseEntity.ok(updatedPost);
@@ -158,15 +152,10 @@ public class PostRestController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(
             @Parameter(description = "작성자 회원 ID", example = "1")
-//            @RequestHeader("X-Member-Id") Long memberId,
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Parameter(description = "삭제할 게시글 ID", example = "1")
             @PathVariable("id") Long postId
     ) {
-        PostResponse post = postService.getPostById(postId);
-        if (!post.memberId().equals(userDetails.getId())) {
-            throw new IllegalStateException("본인의 게시글만 삭제가 가능합니다.");
-        }
         postService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }

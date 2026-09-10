@@ -11,4 +11,10 @@
         WHERE email = #{email}
     </select>
 
+    <select id="findById" parameterType="long" resultType="net.likelion.bebc25.sns.domain.Member">
+        SELECT id, email, password, nickname, profile_image, role, created_at
+        FROM member
+        WHERE id = #{id}
+    </select>
+
 </mapper>

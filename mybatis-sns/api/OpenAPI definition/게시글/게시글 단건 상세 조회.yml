@@ -7,10 +7,10 @@ info:
 
 http:
   method: GET
-  url: "{{baseUrl}}/api/v1/posts/:id"
+  url: "{{baseUrl}}/posts/:id"
   params:
     - name: id
-      value: "1"
+      value: "3"
       type: path
       description: 조회할 게시글 ID
   auth: inherit
