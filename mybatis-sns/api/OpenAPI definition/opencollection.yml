@@ -16,9 +16,8 @@ config:
 
 request:
   auth:
-    type: basic
-    username: user1@example.com
-    password: "1234"
+    type: bearer
+    token: "{{accessToken}}"
 bundled: false
 extensions:
   bruno:

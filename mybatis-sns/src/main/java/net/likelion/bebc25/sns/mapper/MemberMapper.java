@@ -11,4 +11,7 @@ public interface MemberMapper {
 
     // 회원 id 기반 정보 조회
     Member findById(@Param("id") Long id);
+
+    // 신규 회원 등록 (소셜 로그인 자동 회원가입)
+    int save(Member member);
 }

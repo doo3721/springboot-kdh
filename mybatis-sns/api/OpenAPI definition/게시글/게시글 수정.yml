@@ -10,7 +10,7 @@ http:
   url: "{{baseUrl}}/posts/:id"
   params:
     - name: id
-      value: "2"
+      value: "3"
       type: path
       description: 수정할 게시글 ID
   body:
