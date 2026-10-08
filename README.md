@@ -8,6 +8,7 @@
 ### [MyBatis와 트랜잭션 관리](docs/spring-mybatis.md)
 ### [Spring REST API](docs/spring-rest.md)
 ### [Spring Security](docs/spring-security.md)
+### [Spring JPA](docs/spring-jpa.md)
 
 ## 출처
 [멋쟁이사자처럼 백엔드 부트캠프 25기 SpringBoot 프로그래밍 저장소](https://github.com/BEBC-25/springboot-yong)
