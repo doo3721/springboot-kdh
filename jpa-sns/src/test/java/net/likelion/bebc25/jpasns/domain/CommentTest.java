@@ -34,7 +34,8 @@ public class CommentTest {
         this.setUpPostId = post.getId();
 
         // 3. 댓글 등록
-        Comment comment = new Comment(member, setUpPostId, "댓글 테스트");
+        Comment comment = new Comment(member, "댓글 테스트");
+        post.addComment(comment);
         em.persist(comment);
         this.setUpCommentId = comment.getId();
 
@@ -46,7 +47,9 @@ public class CommentTest {
 //    @Commit  // 테스트 종료 후 롤백 시키지 않고 커밋함
     void create() {
         Member member = em.find(Member.class, setUpMemberId);
-        Comment comment = new Comment(member, setUpPostId, "새로운 댓글 테스트");
+        Post post = em.find(Post.class, setUpPostId);
+        Comment comment = new Comment(member, "새로운 댓글 테스트");
+        post.addComment(comment);
         em.persist(comment);
 
         em.clear();
@@ -56,7 +59,7 @@ public class CommentTest {
         assertThat(createdComment).isNotNull();
         assertThat(createdComment.getId()).isEqualTo(comment.getId());
         assertThat(createdComment.getMember().getId()).isEqualTo(setUpMemberId);
-        assertThat(createdComment.getPostId()).isEqualTo(comment.getPostId());
+        assertThat(createdComment.getPost().getId()).isEqualTo(setUpPostId);
         assertThat(createdComment.getContent()).isEqualTo(comment.getContent());
         assertThat(createdComment.getCreatedAt()).isNotNull();
     }
@@ -74,7 +77,7 @@ public class CommentTest {
 
         assertThat(comment).isNotNull();
         assertThat(comment.getMember().getId()).isEqualTo(setUpMemberId);
-        assertThat(comment.getPostId()).isEqualTo(setUpPostId);
+        assertThat(comment.getPost().getId()).isEqualTo(setUpPostId);
         assertThat(comment.getContent()).isEqualTo("댓글 테스트");
         assertThat(comment.getCreatedAt()).isNotNull();
     }

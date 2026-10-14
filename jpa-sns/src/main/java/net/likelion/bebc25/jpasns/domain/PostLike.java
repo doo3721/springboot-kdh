@@ -4,32 +4,19 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.likelion.bebc25.jpasns.common.entity.BasePostReaction;
 import net.likelion.bebc25.jpasns.common.entity.BaseTimeEntity;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = {
+@Table(name = "post_like", uniqueConstraints = {
         @UniqueConstraint(name = "uk_post_like_member_post", columnNames = {"member_id", "post_id"})
 })
-public class PostLike extends BaseTimeEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false)
-    private Member member;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false)
-    private Post post;
-
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class PostLike extends BasePostReaction {
     public PostLike(Member member, Post post) {
-        this.member = member;
-        this.post = post;
+        super(member, post);
     }
 }

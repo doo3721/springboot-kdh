@@ -4,24 +4,30 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.likelion.bebc25.jpasns.common.entity.BaseTimeEntity;
 
 @Entity
+@Table(name = "post_hashtag", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_post_hashtag", columnNames = {"post_id", "tag_id"})
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostHashtag {
+public class PostHashtag extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private Long id;
 
-    @Column(nullable = false)
-    private Long postId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
-    @Column(length = 50, nullable = false)
-    private String tagName;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tag_id", nullable = false)
+    private Tag tag;
 
-    public PostHashtag(Long postId, String tagName) {
-        this.postId = postId;
-        this.tagName = tagName;
+    public PostHashtag(Post post, Tag tag) {
+        this.post = post;
+        this.tag = tag;
     }
 }

@@ -9,6 +9,7 @@ import net.likelion.bebc25.jpasns.common.entity.BaseTimeEntity;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "comment")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseTimeEntity {
@@ -20,19 +21,23 @@ public class Comment extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Member member;
 
-    @Column(nullable = false)
-    private Long postId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post; // 외래 키(post_id) 직접 관리
 
     @Column(length = 500, nullable = false)
     private String content;
 
-    public Comment(Member member, Long postId, String content) {
+    public Comment(Member member, String content) {
         this.member = member;
-        this.postId = postId;
         this.content = content;
     }
 
     public void changeContent(String content) {
         this.content = content;
+    }
+
+    public void assignPost(Post post) {
+        this.post = post;
     }
 }
