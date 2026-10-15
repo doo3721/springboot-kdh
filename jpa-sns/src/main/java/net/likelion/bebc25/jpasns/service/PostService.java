@@ -9,6 +9,8 @@ import net.likelion.bebc25.jpasns.dto.PostDto;
 import net.likelion.bebc25.jpasns.repository.CommentRepository;
 import net.likelion.bebc25.jpasns.repository.MemberRepository;
 import net.likelion.bebc25.jpasns.repository.PostRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,20 +56,42 @@ public class PostService {
         return CommentDto.Response.from(savedComment);
     }
 
-    // 전체 게시글 최신순 목록 조회
-    public List<PostDto.Response> getPosts() {
-        return postRepository.findAllByOrderByCreatedAtDesc().stream()
-                .map(PostDto.Response::from)
-                .toList();
+    // 전체 게시글 목록 조회 (페이징)
+    public Page<PostDto.Response> getPosts(Pageable pageable) {
+        Page<Post> posts = postRepository.findAll(pageable);
+        return posts.map(PostDto.Response::from);
+    }
+
+    // 전체 게시글 목록 조회 (조건 포함)
+    public Page<PostDto.Response> getPosts(Long memberId, String keyword, Pageable pageable) {
+        Page<Post> posts;
+
+        if (memberId != null) {
+            if (!memberRepository.existsById(memberId)) {
+                throw new IllegalArgumentException("존재하지 않는 회원입니다. id = " + memberId);
+            }
+
+            posts = keyword != null
+                    ? postRepository.findByMember_IdAndContentContaining(memberId, keyword, pageable)
+//                    ? postRepository.findByMemberAndKeyword(memberId, keyword, pageable)
+                    : postRepository.findByMember_Id(memberId, pageable);
+        }
+        else {
+            posts = keyword != null ?
+                    postRepository.findByContentContaining(keyword, pageable)
+                    : postRepository.findAllByOrderByCreatedAtDesc(pageable);
+        }
+        return posts.map(PostDto.Response::from);
     }
 
     // 특정 회원이 작성한 게시글 목록 최신순 조회
-    public List<PostDto.Response> getPostsByMember(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다. id = " + memberId));
-
-        return postRepository.findByMember_IdOrderByCreatedAtDesc(memberId).stream()
-                .map(PostDto.Response::from)
-                .toList();
-    }
+//    public List<PostDto.Response> getPostsByMember(Long memberId) {
+//        if (!memberRepository.existsById(memberId)) {
+//            throw new IllegalArgumentException("존재하지 않는 회원입니다. id = " + memberId);
+//        }
+//
+//        return postRepository.findByMember_IdOrderByCreatedAtDesc(memberId).stream()
+//                .map(PostDto.Response::from)
+//                .toList();
+//    }
 }
